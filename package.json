@@ -1,0 +1,26 @@
+{
+  "name": "switch-joystick-gui",
+  "version": "0.0.1",
+  "description": "A GUI for switch-joystick project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncwhale/switch-joystick-gui.git"
+  },
+  "keywords": [
+    "Nintendo",
+    "Switch",
+    "GUI",
+    "Joystick",
+    "Gamepad"
+  ],
+  "author": "Whalemo (ncwhale@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ncwhale/switch-joystick-gui/issues"
+  },
+  "homepage": "https://github.com/ncwhale/switch-joystick-gui#readme"
+}
