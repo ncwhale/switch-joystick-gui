@@ -1,11 +1,28 @@
-# Info
+# joystick-scripter-gui
 
-This is a GUI interface for [switch-joystick](https://github.com/ncwhale/switch-joystick) project.
+> An electron-vue project
 
-This project use [electron-forge](https://electronforge.io) to create/run/pack/dev.
+#### Build Setup
 
-# TODOs
+``` bash
+# install dependencies
+npm install
 
-* A script paser.
-* A script editor with hightlight&autocomplete support.
-* Hotkeys to run script.
+# serve with hot reload at localhost:9080
+npm run dev
+
+# build electron application for production
+npm run build
+
+# run unit & end-to-end tests
+npm test
+
+
+# lint all JS/Vue component files in `src/`
+npm run lint
+
+```
+
+---
+
+This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
