@@ -1,31 +1,40 @@
 <template lang="pug">
-.choose-port
-  p 当前设置端口： {{port_name}}
-  ul
-    li(v-for="port in port_list", @click="changePort(port.comName)") {{port.comName}}
+md-list.choose-port
+  md-subheader Serial Port: {{PortName}}
+  md-list-item(v-for="port in port_list", :key='port.comName')
+    md-radio(v-model='PortName', :value='port.comName')
+      span.md-list-item-text {{port.comName}}
 </template>
 
 <script>
-import SerialPort from 'serialport';
-import { mapActions, mapState } from 'vuex';
+import SerialPort from "serialport";
+import { mapActions, mapState } from "vuex";
 
 export default {
-  name: 'PortList',
+  name: "PortList",
   data() {
     return {
-      port_list: [],
-    }
+      port_list: []
+    };
   },
   computed: {
     ...mapState({
-      port_name: state => state.Joystick.port_name,
+      port_name: state => state.Joystick.port_name
     }),
+    PortName: {
+      get() {
+        return this.port_name;
+      },
+      set(val) {
+        return this.changePort(val);
+      }
+    }
   },
   methods: {
-    ...mapActions(['changePort']),
+    ...mapActions(["changePort"])
   },
   async mounted() {
     this.port_list = await SerialPort.list();
-  },
+  }
 };
 </script>

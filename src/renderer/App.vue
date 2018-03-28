@@ -7,43 +7,49 @@
           .md-toolbar-section-start
             md-button.md-icon-button(@click='menuVisible = !menuVisible')
               md-icon menu
+            span.md-title {{Title}}
           //- md-tabs.md-primary
             //- md-tab#tab-home(md-label='Home')
             //- md-tab#tab-pages(md-label='Pages')
             //- md-tab#tab-posts(md-label='Posts')
             //- md-tab#tab-favorites(md-label='Favorites') 
           .md-toolbar-section-end
-            md-button.md-icon-button
-              md-icon more_vert
+            router-link.md-icon-button(tag='md-button', to='/settings')
+              md-icon settings
       md-app-drawer(:md-active.sync="menuVisible")
         md-toolbar.md-transparent(md-elevation='0')
           | Navigation
-        md-list
+        md-list(@click='menuVisible = false')
           router-link(tag='md-list-item' to='/')
-            md-icon move_to_inbox
+            md-icon home
             span.md-list-item-text Home
           router-link(tag='md-list-item' to='/settings')
-            md-icon send
+            md-icon settings
             span.md-list-item-text Settings
-          md-list-item
-            md-icon delete
-            span.md-list-item-text Trash
-          md-list-item
-            md-icon error
-            span.md-list-item-text Spam
       md-app-content
         router-view
 </template>
 
 <script>
-  export default {
-    name: 'joystick-scripter-gui',
-    data() {
-      return {
-        menuVisible: false
-      }
+import { mapGetters } from 'vuex';
+
+export default {
+  name: 'joystick-scripter-gui',
+  data() {
+    return {
+      menuVisible: false,
     }
-  };
+  },
+  computed: {
+    Title() {
+      if('title' in this.$route.meta) {
+        return this.$route.meta.title
+      }
+
+      return 'Home'
+    }
+  }
+};
 </script>
 
 <style>

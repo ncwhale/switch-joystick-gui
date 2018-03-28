@@ -3,16 +3,19 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
-export default new Router({
+let router = new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
       name: 'home-page',
+      meta: { title: 'Home', },
       component: require('@/components/Home').default,
     },
     {
       path: '/settings',
       name: 'setting-page',
+      meta: { title: 'Settings', },
       component: require('@/components/Settings').default,
     },
     {
@@ -20,4 +23,7 @@ export default new Router({
       redirect: '/',
     },
   ],
+
 });
+
+export default router;
