@@ -1,6 +1,5 @@
 <template lang="pug">
 div
-  router-link(to='/settings') settings
   .test-area
     button(@click="start") Boom!
 </template>
