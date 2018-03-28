@@ -15,24 +15,28 @@ export const BUTTONS = Object.freeze({
   SWITCH_CAPTURE : 0x4000,
 })
 
+export const HAT_DIRECTION = Object.freeze({
+  
+})
+
+const reset_buffer = new Uint8Array(1);
+const hard_reset_buffer = new Uint8Array(1);
+reset_buffer[0] = 0xC0;
+hard_reset_buffer[0] = 0xFF;
+
 export class Joystick {
   constructor (output) {
     // output just something can write.
     this.out = output;
     this.HardReset();
-    this.Reset();
   }
 
   Reset() {
-    const buf = new Uint8Array(1)
-    buf[0] = 0xC0
-    this.out.write(buf);
+    this.out.write(reset_buffer);
   }
 
   HardReset() {
-    const buf = new Uint8Array(1)
-    buf[0] = 0xFF
-    this.out.write(buf);
+    this.out.write(hard_reset_buffer);
   }
 
   setButtons(buttons) {
@@ -66,6 +70,7 @@ export class Joystick {
   }
 }
 
-Joystick.BUTTONS = BUTTONS
+Joystick.prototype.BUTTONS = BUTTONS
+Joystick.prototype.HAT = HAT_DIRECTION
 
 export default Joystick;
