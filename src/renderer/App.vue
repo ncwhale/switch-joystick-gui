@@ -8,14 +8,10 @@
             md-button.md-icon-button(@click='menuVisible = !menuVisible')
               md-icon menu
             span.md-title {{Title}}
-          //- md-tabs.md-primary
-            //- md-tab#tab-home(md-label='Home')
-            //- md-tab#tab-pages(md-label='Pages')
-            //- md-tab#tab-posts(md-label='Posts')
-            //- md-tab#tab-favorites(md-label='Favorites') 
           .md-toolbar-section-end
-            router-link.md-icon-button(tag='md-button', to='/settings')
-              md-icon settings
+            template(v-show!="CurrentRouteName != 'setting-page'")
+              router-link.md-icon-button( tag='md-button', to='/settings')
+                md-icon settings
       md-app-drawer(:md-active.sync="menuVisible")
         md-toolbar.md-transparent(md-elevation='0')
           | Navigation
@@ -47,6 +43,9 @@ export default {
       }
 
       return 'Home'
+    },
+    CurrentRouteName() {
+      return this.$route.name;
     }
   }
 };
