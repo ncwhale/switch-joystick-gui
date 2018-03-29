@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "bluebird": "^3.5.1",
     "pug": "^2.0.3",
     "pug-loader": "^2.3.0",
     "serialport": "^6.1.1",
