@@ -12,66 +12,98 @@
           md-icon launch
           |  run
   md-empty-state(v-show!='scripts.length === 0', md-icon='devices_other', md-label='Create your first script', md-description="Creating script, you'll be able to control switch as your wish.")
-    md-button.md-primary.md-raised(@click="start") Create first script
-  md-dialog-alert(:md-active.sync='show_serialport_alert', md-title='Open Serialport Error!', md-content='You have to verify your settings.')
+    md-button.md-primary.md-raised(@click="") Create first script
+  md-dialog-alert(:md-active.sync='show_serialport_alert', 
+    md-title='Open Serialport Error!', 
+    md-content='You have to verify your settings.'
+    @md-closed='$router.replace({name:"setting-page"})'
+  )
+  md-dialog-alert(:md-active.sync='show_watchfolder_alert', 
+    md-title='Watch Script Folder Error!', 
+    md-content='You have to verify your settings.'
+    @md-closed='$router.replace({name:"setting-page"})'
+  )
 </template>
 
 <script>
-import Promise from 'bluebird'
-import SerialPort from 'serialport'
-import Joystick from '~/scripts/joystick'
-import { mapState } from 'vuex';
-import { resolve } from 'url';
+import Promise from "bluebird";
+import SerialPort from "serialport";
+import Joystick from "~/scripts/joystick";
+import { mapState } from "vuex";
+import { resolve } from "url";
 
 export default {
-  name: 'Home',
+  name: "Home",
   data() {
     return {
       scripts: [],
       show_serialport_alert: false,
-    }
+      show_watchfolder_alert: false,
+    };
   },
   computed: {
     ...mapState({
-      port_name: state => state.Joystick.port_name,
-    }),
+      port_name: state => state.Settings.port_name
+    })
+  },
+  watch: {
+    port_name() {
+      this.init()
+    }
   },
   methods: {
-    start() {
-      if (this.serial_port !== null) {
-        try {
-          if (this.serial_port.isOpen) this.serial_port.close()
-        } catch(err) {
-          console.warn(err)
-        }
-      }
-      
-      this.serial_port = null
-      this.joystick = null
+    init() {
+      this.initSerialPort().catch(err => {
+        console.warn(err);
+        this.show_serialport_alert = true;
+      });
 
-      return Promise.delay(200).then(() => {
+      this.initScriptWatch().catch(err => {
+        console.warn(err);
+        this.show_watchfolder_alert = true;
+      });
+    },
+    async initSerialPort() {
+      if (!this.serial_port) {
         this.serial_port = new SerialPort(this.port_name, {
-          autoOpen: true,
+          autoOpen: false,
           baudRate: 250000, // 250k bps
           dataBits: 8,
           parity: 'none',
           stopBits: 1,
         })
+      }
 
-        this.joystick = new Joystick(this.serial_port)
-      }).catch(err => {
-        console.log(err)
-        this.show_serialport_alert = true
-        this.joystick = null
-        this.serial_port = null
-      })
+      if (this.serial_port.path !== this.port_name) {
+        if (this.serial_port.isOpen) await this.serial_port.close();
+
+        this.serial_port.path = "" + this.port_name;
+      }
+
+      if (!this.serial_port.isOpen) {
+        await this.serial_port.open();
+      }
     },
+    async initScriptWatch() {
+      throw new Error("Not done yet.");
+    },
+    deinit() {
+      this.deinitSerialPort();
+      this.deinitScriptWatch();
+    },
+    async deinitSerialPort() {
+      if (this.serial_port.isOpen) await this.serial_port.close();
+    },
+    async deinitScriptWatch() {
+      throw new Error("Not done yet.");
+    }
   },
   components: {},
   mounted() {
-    // Do not need reactive on these native objects.
-    this.joystick = null
-    this.serial_port = null  
+    this.init();
+  },
+  beforeDestroy() {
+    this.deinit();
   }
 };
 </script>
@@ -81,7 +113,7 @@ export default {
   width: 30%;
   margin: 4px;
   display: inline-block;
-  /* vertical-align: top; */
+  vertical-align: top;
 }
 </style>
 
