@@ -24,8 +24,12 @@ const hard_reset_buffer = new Uint8Array(1);
 reset_buffer[0] = 0xC0;
 hard_reset_buffer[0] = 0xFF;
 
+const fake_output = {
+  write: ()=>{},
+}
+
 export class Joystick {
-  constructor (output) {
+  constructor (output = fake_output) {
     // output just something can write.
     this.out = output;
     this.HardReset();
