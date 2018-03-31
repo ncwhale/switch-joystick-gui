@@ -21,7 +21,9 @@ export const HAT_DIRECTION = Object.freeze({
 
 const reset_buffer = new Uint8Array(1);
 const hard_reset_buffer = new Uint8Array(1);
+const sync_buffer = new Uint8Array(1);
 reset_buffer[0] = 0xC0;
+sync_buffer[0] = 0xD0
 hard_reset_buffer[0] = 0xFF;
 
 const fake_output = {
@@ -41,6 +43,24 @@ export class Joystick {
 
   HardReset() {
     this.out.write(hard_reset_buffer);
+  }
+
+  sync() {
+    this.out.write(sync_buffer)
+  }
+
+  delay(ms) {
+    let buf
+    ms = parseInt(ms)
+    while(ms > 0){
+      if (ms >= 1 << 21) {
+                
+      } else if (ms >= 1 << 14) {
+
+      } else {
+        
+      }
+    }
   }
 
   setButtons(buttons) {
