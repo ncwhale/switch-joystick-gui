@@ -31,8 +31,8 @@ export default {
           properties: ['openDirectory']
       })
 
-      if(path !== undefined) {
-        this.changeScriptFolder(path)
+      if(path !== undefined && path.length >= 1) {
+        this.changeScriptFolder(path[0])
       }
     }
   }
