@@ -1,11 +1,12 @@
 <template lang="pug">
 .home-page
-  md-card(md-with-hover='', v-for!='script in scripts', :key='script.name')
+  md-card(md-with-hover='', v-for!='script in scripts', :key='script')
     md-ripple
       md-card-header
-        .md-title {{script.name}}
-      md-card-content {{script.desc}}
-      md-card-actions
+        .md-title {{script_map[script].name}}
+      md-card-content {{script_map[script].desc}}
+        md-icon {{script_map[script].type}}
+      //- md-card-actions
         md-button.md-icon-button
           md-icon code
         md-button.primary
@@ -29,27 +30,39 @@
 import Promise from "bluebird";
 import SerialPort from "serialport";
 import Joystick from "~/scripts/joystick";
+import Watcher from "~/scripts/watcher";
+import Parser from "~/scripts/parser";
 import { mapState } from "vuex";
 import { resolve } from "url";
+import path from "path";
 
 export default {
   name: "Home",
   data() {
     return {
       scripts: [],
+      script_map: {},
+      process_files: [],
       show_serialport_alert: false,
-      show_watchfolder_alert: false,
+      show_watchfolder_alert: false
     };
   },
   computed: {
     ...mapState({
-      port_name: state => state.Settings.port_name
+      port_name: state => state.Settings.port_name,
+      script_folder: state => state.Settings.script_folder
     })
   },
   watch: {
     port_name() {
-      this.init()
-    }
+      this.init();
+    },
+    script_folder() {
+      this.script_watcher.start(this.script_folder);
+    },
+    process_files() {
+      this.start_parse();
+    },
   },
   methods: {
     init() {
@@ -69,9 +82,9 @@ export default {
           autoOpen: false,
           baudRate: 250000, // 250k bps
           dataBits: 8,
-          parity: 'none',
-          stopBits: 1,
-        })
+          parity: "none",
+          stopBits: 1
+        });
       }
 
       if (this.serial_port.path !== this.port_name) {
@@ -85,7 +98,30 @@ export default {
       }
     },
     async initScriptWatch() {
-      throw new Error("Not done yet.");
+      this.scripts = [];
+
+      if (!this.script_watcher) {
+        this.script_watcher = new Watcher(this.script_folder);
+
+        this.script_watcher.on("change", filename => {
+          console.log(`Watch file: ${filename}`);
+          // Try to reparse that file.
+          this.process_files.push(filename);
+        });
+
+        this.script_watcher.on("rename", filename => {
+          // TODO:???
+          this.process_files.push(filename);
+        });
+
+        this.script_watcher.on("error", filename => {
+          console.warn(`Watch error: ${filename}`);
+        });
+
+        this.process_files = this.script_watcher.start();
+      } else if (this.script_watcher.watch_dir != this.script_folder) {
+        this.process_files = this.script_watcher.start(this.script_folder);
+      }
     },
     deinit() {
       this.deinitSerialPort();
@@ -95,7 +131,38 @@ export default {
       if (this.serial_port.isOpen) await this.serial_port.close();
     },
     async deinitScriptWatch() {
-      throw new Error("Not done yet.");
+      if (this.script_watcher) this.script_watcher.stop();
+      delete this.script_watcher;
+    },
+    start_parse() {
+      if(this.process_files.length === 0) return;
+      
+      let files = this.process_files.slice();
+      let folder = "" + this.script_folder;
+      this.process_files = [];
+      return Promise.map(
+        files,
+        filename => {
+          return this.parse_file(path.join(folder, filename));
+        },
+        { concurrency: 4 }
+      );
+    },
+    async parse_file(file) {
+      let script = await Parser(file);
+      if (script) {
+        this.$set(this.script_map, file, script)
+
+        if(!this.scripts.includes(file)) {
+          if (script.type === "folder") {
+            this.scripts.unshift(file);
+          } else {
+            this.scripts.push(file);
+          }
+        }
+      } else {
+        this.scripts = this.scripts.filter(_=> _ != file)
+      }
     }
   },
   components: {},
