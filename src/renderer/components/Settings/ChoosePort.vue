@@ -19,7 +19,7 @@ export default {
   },
   computed: {
     ...mapState({
-      port_name: state => state.Joystick.port_name
+      port_name: state => state.Settings.port_name
     }),
     PortName: {
       get() {
